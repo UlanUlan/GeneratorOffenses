@@ -10,59 +10,34 @@ namespace X
 {
     class Program
     {
+        private static Random rand = new Random();
+
         static void Main(string[] args)
         {
-            Random rand = new Random();
-            City c = new City();
-            for (int i = 0; i < 200; i++)
-            {
-                c.citizen.Add(new Citizen());
-            }
-
-
+            Service service = new Service("almaty.xml");
+         
+            City c = Generator.GenerateCity();
 
             for (int i = 0; i < 100; i++)
+                Generator.GeneratorOffenses(c.citizen[rand.Next(0, c.citizen.Count)]);
+
+          
+            foreach (var cat in c.citizen.GroupBy(g=>g.category))
             {
-                Generator.GeneratorOffenses(c.citizen[rand.Next(10)]);
+                service.XmlSerialize(c.citizen, cat.Key);
             }
 
-            //c.printInfo();
+            //foreach (Citizen item in XmlDeserialize())
+            //{
+            //    Console.WriteLine(item.age);
+            //    Console.WriteLine(item.category);
+            //    Console.WriteLine("----------------------------");
+            //}
 
-           
-            XmlSerialize(c.citizen, (Category)rand.Next(0,9));
-
-            foreach (Citizen item in XmlDeserialize())
-            {
-                Console.WriteLine(item.age);
-                Console.WriteLine(item.category);
-                Console.WriteLine("----------------------------");
-            }
+            
         }
 
-        public static void XmlSerialize(List<Citizen> citizen, Category _category)
-        {
-            List<Citizen> citizen1 = citizen.Where(category => category.category == _category).ToList();
-
-            XmlSerializer formatter = new XmlSerializer(typeof(List<Citizen>));                      
-            using (FileStream fs = new FileStream(citizen + ".xml", FileMode.OpenOrCreate))
-            {
-                //formatter.Serialize(fs, citizen.Where(category => category.category == _category).ToList());
-                formatter.Serialize(fs, citizen1);
-            }
-        }
-
-        public static List<Citizen> XmlDeserialize()
-        {
-            List<Citizen> citizen = new List<Citizen>();
-            XmlSerializer formatter = new XmlSerializer(typeof(List<Citizen>));                      
-            using (FileStream fs = new FileStream(citizen + ".xml", FileMode.OpenOrCreate))
-            {
-                citizen = (List<Citizen>)formatter.Deserialize(fs);
-            }
-
-            return citizen;
-        }
-
+       
 
     }
 }
